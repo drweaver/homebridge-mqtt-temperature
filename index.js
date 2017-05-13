@@ -48,13 +48,15 @@ function TemperatureAccessory(log, config) {
     this.client.subscribe(this.topic);
 
   this.client.on('message', function (topic, message) {
-    // message is Buffer
-    data = JSON.parse(message);
-    if (data === null) {return null}
-    that.temperature = parseFloat(data);
-    that.service
-      .setCharacteristic(Characteristic.CurrentTemperature, that.temperature);
-
+    try {
+      // message is Buffer
+      var data = JSON.parse(message);
+      if (data === null) {return null}
+      that.temperature = parseFloat(data);
+      that.service.setCharacteristic(Characteristic.CurrentTemperature, that.temperature);
+    } catch(e) {
+      that.log("Error parsing temperature value: " + message + ". ", e );
+    }
 });
 
 
